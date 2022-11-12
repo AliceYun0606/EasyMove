@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:testingproject/dummy_order.dart';
 
 const String url = "awcgroup.com.my";
 const String unencodedPath = "/easymovenpick.com/api/driver_on_off.php";
@@ -40,34 +41,45 @@ class _HomeState extends State<HomePage> {
       body: Center(
         child: Column(
           children: [
-            DriverProfile(),
-            StatusSwitch(),
+            _upperPart(),
+            _orderCard(),
           ],
         ),
       ),
     );
   }
 
-  Widget DriverProfile() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget> [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Text(
+  Widget _upperPart() {
+    return Container(
+      child: Row(
+        children: [
+          _driverProfile(),
+          _statusSwitch(),
+        ]
+      ),
+    );
+  }
+
+  Widget _driverProfile() {
+    return Container( // 'Hi Driver' Text
+      margin: EdgeInsets.all(20.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget> [
+          Text(
             "Hi Driver",
-            style: Theme.of(context)
-                .textTheme
-                .headline5
-                ?.copyWith(fontWeight: FontWeight.bold),
+            style: Theme.of(context).textTheme.headline5?.copyWith(fontWeight: FontWeight.bold),
           ),
-        ),
-        Image.asset(
-          'assets/icon/profilepic.png',
-          height: 100,
-          width: 200,
-        ),
-      ],
+          Container( // Driver Profile pic
+            margin: EdgeInsets.all(10.0),
+            child: Image.asset(
+              'assets/icon/profilepic.png',
+              height: 100,
+              width: 100,
+            ),
+          )
+        ],
+      ),
     );
   }
 
@@ -94,22 +106,52 @@ class _HomeState extends State<HomePage> {
     }
   }
 
-  Widget StatusSwitch() {
-    return Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [ Transform.scale(
-          scale: 1,
-          child: Switch(
-            activeColor: Colors.green,
-            activeTrackColor: Colors.green.shade300,
-            inactiveThumbColor: Colors.red,
-            inactiveTrackColor: Colors.red.shade300,
-            value: isSwitched,
-            onChanged: toggleSwitch,
-            )
+  Widget _statusSwitch() {
+    return Container(
+        margin: EdgeInsets.all(80.0),
+        child: Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [ Transform.scale(
+                scale: 1,
+                child: Switch(
+                  activeColor: Colors.green,
+                  activeTrackColor: Colors.green.shade300,
+                  inactiveThumbColor: Colors.red,
+                  inactiveTrackColor: Colors.red.shade300,
+                  value: isSwitched,
+                  onChanged: toggleSwitch,
+                )
+            ),
+              // Text('$textValue', style: TextStyle(fontSize: 20),)
+            ]
         ),
-            Text('$textValue', style: TextStyle(fontSize: 20),)
-        ]
+    );
+  }
+
+  Widget _orderCard() {
+    return Container(
+        child: ListView.builder(
+            itemCount:allorder.length,
+            itemBuilder: (BuildContext context, int index) {
+              OrderData data = allorder[index];
+
+              return Card(
+                child: ListTile (
+                  title: Text(data.id),
+                  subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: <Widget> [
+                        Text(data.company),
+                        Text(data.address)
+                      ]
+                  ),
+                  leading: const CircleAvatar(
+                    backgroundImage: AssetImage("assets/icon/truck.png"),
+                  ),
+                  tileColor: Colors.white60,
+                ),
+              );
+            })
     );
   }
 }
