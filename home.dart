@@ -62,7 +62,7 @@ class _HomeState extends State<HomePage> {
 
   Widget _driverProfile() {
     return Container( // 'Hi Driver' Text
-      margin: EdgeInsets.all(20.0),
+      margin: EdgeInsets.only(left: 20, top:0, right:0, bottom:0),,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget> [
@@ -108,7 +108,7 @@ class _HomeState extends State<HomePage> {
 
   Widget _statusSwitch() {
     return Container(
-        margin: EdgeInsets.all(80.0),
+        margin: EdgeInsets.only(left: 200, top:0, right:0, bottom:0),,
         child: Column(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [ Transform.scale(
