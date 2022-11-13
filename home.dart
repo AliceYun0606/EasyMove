@@ -51,6 +51,9 @@ class _HomeState extends State<HomePage> {
 
   Widget _upperPart() {
     return Container(
+      decoration: BoxDecoration(
+          border: Border.all(color: Colors.blueAccent)
+      ),
       child: Row(
         children: [
           _driverProfile(),
@@ -61,8 +64,11 @@ class _HomeState extends State<HomePage> {
   }
 
   Widget _driverProfile() {
-    return Container( // 'Hi Driver' Text
-      margin: EdgeInsets.only(left: 20, top:0, right:0, bottom:0),,
+    return Container(
+      decoration: BoxDecoration(
+          border: Border.all(color: Colors.blueAccent)
+      ),
+      margin: EdgeInsets.only(left:20, top:10, right:0, bottom:10),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget> [
@@ -70,8 +76,10 @@ class _HomeState extends State<HomePage> {
             "Hi Driver",
             style: Theme.of(context).textTheme.headline5?.copyWith(fontWeight: FontWeight.bold),
           ),
-          Container( // Driver Profile pic
-            margin: EdgeInsets.all(10.0),
+          Container(
+            decoration: BoxDecoration(
+                border: Border.all(color: Colors.blueAccent)
+            ),
             child: Image.asset(
               'assets/icon/profilepic.png',
               height: 100,
@@ -108,47 +116,72 @@ class _HomeState extends State<HomePage> {
 
   Widget _statusSwitch() {
     return Container(
-        margin: EdgeInsets.only(left: 200, top:0, right:0, bottom:0),,
-        child: Column(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [ Transform.scale(
-                scale: 1,
-                child: Switch(
-                  activeColor: Colors.green,
-                  activeTrackColor: Colors.green.shade300,
-                  inactiveThumbColor: Colors.red,
-                  inactiveTrackColor: Colors.red.shade300,
-                  value: isSwitched,
-                  onChanged: toggleSwitch,
-                )
-            ),
-              // Text('$textValue', style: TextStyle(fontSize: 20),)
-            ]
+        decoration: BoxDecoration(
+            border: Border.all(color: Colors.blueAccent)
         ),
+        margin: EdgeInsets.only(left:200, top:0, right:0, bottom:0),
+        child: Transform.scale(
+            scale: 1,
+            child: Switch(
+              activeColor: Colors.green,
+              activeTrackColor: Colors.green.shade300,
+              inactiveThumbColor: Colors.red,
+              inactiveTrackColor: Colors.red.shade300,
+              value: isSwitched,
+              onChanged: toggleSwitch,
+            )
+        // Column(
+        //     mainAxisAlignment: MainAxisAlignment.end,
+        //     children: [ Transform.scale(
+        //         scale: 1,
+        //         child: Switch(
+        //           activeColor: Colors.green,
+        //           activeTrackColor: Colors.green.shade300,
+        //           inactiveThumbColor: Colors.red,
+        //           inactiveTrackColor: Colors.red.shade300,
+        //           value: isSwitched,
+        //           onChanged: toggleSwitch,
+        //         )
+        //     ),
+        //       // Text('$textValue', style: TextStyle(fontSize: 20),)
+        //     ]
+        // ),
+        )
     );
   }
 
   Widget _orderCard() {
-    return Container(
+    return Expanded(
         child: ListView.builder(
             itemCount:allorder.length,
             itemBuilder: (BuildContext context, int index) {
               OrderData data = allorder[index];
 
-              return Card(
-                child: ListTile (
-                  title: Text(data.id),
-                  subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: <Widget> [
-                        Text(data.company),
-                        Text(data.address)
-                      ]
+              return Container(
+                decoration: BoxDecoration(
+                    border: Border.all(color: Colors.blueAccent)
+                ),
+                height: 100,
+                margin: EdgeInsets.only(left:20, top:10, right:20, bottom:10),
+                child: Card(
+                  child: ListTile (
+                    title: Text(data.id),
+                    subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget> [
+                          Text(data.company),
+                          Text(data.address)
+                        ]
+                    ),
+                    leading: const CircleAvatar(
+                      backgroundImage: AssetImage("assets/icon/truck.png"),
+                    ),
+                    trailing: Icon(Icons.arrow_forward_ios_outlined),
+                    tileColor: Colors.white60,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20.0),
+                    ),
                   ),
-                  leading: const CircleAvatar(
-                    backgroundImage: AssetImage("assets/icon/truck.png"),
-                  ),
-                  tileColor: Colors.white60,
                 ),
               );
             })
