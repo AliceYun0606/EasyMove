@@ -12,10 +12,10 @@ class NotificationData {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['title'] = this.title;
-    data['message'] = this.message;
-    data['created'] = this.date;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['title'] = title;
+    data['message'] = message;
+    data['created'] = date;
     return data;
   }
 }
