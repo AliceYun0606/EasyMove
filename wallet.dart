@@ -6,9 +6,9 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:driver_integrated/driver.dart';
 import 'package:driver_integrated/withdrawal.dart';
+import 'package:driver_integrated/my_api_service.dart';
 
 final String url = "awcgroup.com.my";
-// final String unencodedPath = "/easymovenpick.com/api/commission_statement.php";
 final Map<String, String> header = {'Content-Type': 'application/json; charset=UTF-8'};
 String? commission_value;
 String display_commission_value = "";
@@ -16,22 +16,6 @@ int? merit_value;
 String display_merit_value = "";
 bool withdraw = false;
 List<dynamic>? commissions;
-
-// void makePostRequest(String url, String unencodedPath, Map<String, String> header, Map<String,String> requestBody) async {
-//   final response = await http.post(
-//       Uri.http(url,unencodedPath),
-//       // headers: header,
-//       body: requestBody
-//   );
-//   final data = json.decode(response.body);
-//   commission_value = (data["commission_bonus"]);
-//   merit_value = (data["withdrawable_merit"]);
-//   commissions = (data["commissions"]);
-//   display_commission_value = commission_value.toString();
-//   display_merit_value = merit_value.toString();
-//   // print(response.statusCode);
-//   print(response.body);
-// }
 
 void makePostRequestWithdrawal(String url,String unencodedPath, Map<String,String> requestBody) async {
   final response = await http.post(
@@ -41,11 +25,12 @@ void makePostRequestWithdrawal(String url,String unencodedPath, Map<String,Strin
   // print(response.statusCode);
   // print(response.body);
   final data = json.decode(response.body);
+  print(data);
   String msg = (data["message"]);
   if (msg == "Request sent successfully.")
-    {
-      withdraw = true;
-    }
+  {
+    withdraw = true;
+  }
 }
 
 // class Wallet extends StatelessWidget {
@@ -70,8 +55,7 @@ void makePostRequestWithdrawal(String url,String unencodedPath, Map<String,Strin
 // }
 
 class Wallet extends StatefulWidget {
-  final Map<String, dynamic> text;
-  const Wallet(this.text);
+  Map<String, dynamic> text = {};
   @override
   walletPageState createState() {
     return walletPageState();
@@ -79,42 +63,38 @@ class Wallet extends StatefulWidget {
 }
 
 class walletPageState extends State<Wallet> {
-  @override
-  void initState() {
-    super.initState();
-
-    final data = widget.text;
-    // final commission_value = (data?["commission_bonus"]);
-    // final merit_value = (data?["withdrawable_merit"]);
-    // final commissions = (data?["commissions"]);
-    // final display_commission_value = commission_value.toString();
-    // final display_merit_value = merit_value.toString();
-  }
+  Driver driver = Driver();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-        centerTitle: true,
-        title: Text("Wallet", style: const TextStyle(color: Colors.white),),
-        backgroundColor: const Color.fromARGB(255, 255, 168, 0),
+          centerTitle: true,
+          title: Text("Wallet", style: const TextStyle(color: Colors.white),),
+          backgroundColor: const Color.fromARGB(255, 255, 168, 0),
         ),
-    body:Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          _commission(),
-          Padding(
-            padding: EdgeInsets.only(top: 10, left: 175),
-            child: _requestbutton(context),
-          ),
-          _merit(),
-          Padding(
-            padding: EdgeInsets.only(top: 10, left: 175),
-            child: _requestbutton(context),
-          ),
-          // _commissionlist(),
-        ],
-      ));
+        body:Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            _commission(),
+            Padding(
+              padding: EdgeInsets.only(top: 10, left: 175),
+              child: _requestbutton(context),
+            ),
+            _merit(),
+            Padding(
+              padding: EdgeInsets.only(top: 10, left: 175),
+              child: _requestbutton(context),
+            ),
+            // _commissionlist(),
+          ],
+        ));
+  }
+
+  Future<Map<String, dynamic>> initWallet() async{
+    final meritData = await MyApiService.getCommissionStatement(driver.id.toString());
+    widget.text = meritData;
+    return meritData;
   }
 
   Widget _commission() {
@@ -147,46 +127,59 @@ class walletPageState extends State<Wallet> {
   }
 
   Widget _merit() {
-    return Container(
-      width: double.maxFinite,
-      padding: EdgeInsets.all(10),
-      margin: EdgeInsets.only(left: 50, right: 50, top: 20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border.all(color: Colors.black, width: 0.1),
-        borderRadius: BorderRadius.circular(5.0),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.5),
-            spreadRadius: 5,
-            blurRadius: 7,
-            offset: Offset(0, 3),
-          )
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text("MERIT",
-            style: TextStyle(color: Colors.orange[400], fontSize: 18),),
-          Text(
-            "RM " + widget.text["withdrawable_merit"].toString(),
-            style: TextStyle(fontSize: 30, color: Colors.black),
+    return FutureBuilder(
+      future: initWallet(),
+      builder: (BuildContext context, AsyncSnapshot<Map<String, dynamic>> snapshot) {
+        return Container(
+          width: double.maxFinite,
+          padding: EdgeInsets.all(10),
+          margin: EdgeInsets.only(left: 50, right: 50, top: 20),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            border: Border.all(color: Colors.black, width: 0.1),
+            borderRadius: BorderRadius.circular(5.0),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.5),
+                spreadRadius: 5,
+                blurRadius: 7,
+                offset: Offset(0, 3),
+              )
+            ],
           ),
-        ],
-      ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if(snapshot.hasData)...[
+                Text("MERIT",
+                  style: TextStyle(color: Colors.orange[400], fontSize: 18),),
+                Text(
+                  "RM ${widget.text["withdrawable_merit"].toString()}",
+                  style: const TextStyle(fontSize: 30, color: Colors.black),
+                ),
+              ]else...[
+                const Text("Loading"),
+              ]
+            ],
+          ),
+        );
+      }
     );
   }
 
   Widget _commissionbonus()
   {
-    if(widget.text["commission_bonus"].toString() != null){
-      return Text("RM " + widget.text["commission_bonus"].toString(),
-        style: TextStyle(fontSize: 30, color: Colors.black),);
-    }
-    else{
-      return Text("Loading");
-    }
+    return FutureBuilder(
+      future: initWallet(),
+      builder: (BuildContext context, AsyncSnapshot<Map<String, dynamic>> snapshot) {
+        if(snapshot.hasData){
+            return Text("RM ${widget.text["commission_bonus"].toString()}",
+              style: const TextStyle(fontSize: 30, color: Colors.black),);
+        }else{
+          return const Text("Loading");
+        }
+      }
+    );
   }
 
   Widget _requestbutton(context) {

@@ -4,11 +4,11 @@ import 'package:http/http.dart' as http;
 import 'package:getwidget/getwidget.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:driver_integrated/Notice.dart';
+import 'package:driver_integrated/my_api_service.dart';
 
 final String url = "awcgroup.com.my";
 final String unencodedPath = "/easymovenpick.com/api/driver_apply.php";
 final Map<String, String> headers = {'Content-Type': 'application/json; charset=UTF-8'};
-
 
 void makePostRequest(String url, String unencodedPath, Map<String, String> header, Map<String,String> requestBody) async {
   final response = await http.post(
@@ -68,7 +68,7 @@ class SignupVehicle extends StatelessWidget {
             onTap:(){
               if (_formKey.currentState!.validate() && driver_license_image != null && back_vehicle_image != null && front_vehicle_image != null) {
                 final Map<String, String> body = {'region':"$region",
-                                                  "type":vehicle_type_value,
+                                                  "type": "${vehicleMap[vehicle_type_value]}",
                                                   "name":fullname,
                                                   "time":employmenttype,
                                                   "mobile":mobilenumber,
@@ -105,21 +105,15 @@ class signupForm extends StatefulWidget {
 class signupFormState extends State<signupForm> {
   final ImagePicker picker = ImagePicker();
 
-  // void httpMessage(String message){
-  //   showDialog(
-  //       context: context,
-  //       builder: (BuildContext context){
-  //         return AlertDialog(
-  //             shape:
-  //             RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-  //             title: Text('Error'),
-  //             content: Container(
-  //               height: MediaQuery.of(context).size.height / 6,
-  //               child: Text("k"),
-  //             )
-  //         );
-  //       });
-  // }
+  Future<List> getVehicles() async{
+    vehicles = await MyApiService.getVehicles();
+    vehicleMap = vehicles[0];
+    vehicleType = vehicles[1];
+    if(vehicle_type_value == ""){
+      vehicle_type_value = vehicleType[0];
+    }
+    return vehicles;
+  }
 
   //we can upload image from camera or from gallery based on parameter
   Future getImage(ImageSource media, String info) async {
@@ -192,27 +186,40 @@ class signupFormState extends State<signupForm> {
   Widget build(BuildContext context){
     return Form(
       key: _formKey,
-      child: new SingleChildScrollView(
+      child: SingleChildScrollView(
         padding: EdgeInsets.only(left:15,right:15),
-        child: new Column(
+        child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
 
             //input vehicle type
-            DropdownButton(
-              value: vehicle_type_value,
-              items: vehicle_type.map((String vehicle_type) {
-                return DropdownMenuItem(
-                  value: vehicle_type,
-                  child: Text(vehicle_type),
-                );
-              }).toList(),
-              icon: const Icon(Icons.keyboard_arrow_down),
-              onChanged: (String? newValue) {
-                setState(() {
-                  vehicle_type_value = newValue!;
-            });
-            },
+            Column(
+              children: [
+                const Padding(
+                  padding: EdgeInsets.only(top: 16),
+                  child: Text("Vehicle Type"),
+                ),
+                FutureBuilder(
+                  future: getVehicles(),
+                  builder: (context, snapshot){
+                    return DropdownButton(
+                      value: vehicle_type_value,
+                      items: vehicleType.map<DropdownMenuItem<String>>((String vehicleType) {
+                        return DropdownMenuItem(
+                          value: vehicleType,
+                          child: Text(vehicleType),
+                        );
+                      }).toList(),
+                      icon: const Icon(Icons.keyboard_arrow_down),
+                      onChanged: (String? newValue) {
+                        setState(() {
+                          vehicle_type_value = newValue!;
+                        });
+                      },
+                    );
+                  },
+                )
+              ],
             ),
 
             //input vehicle owner
@@ -339,15 +346,10 @@ class signupFormState extends State<signupForm> {
 }
 
 //vehicle type drop down list values
-var vehicle_type = [
-  'Motorcycle',
-  'Sedan',
-  'SUV',
-  'Pickup Truck',
-  'Van',
-  'Lorry',
-];
-String vehicle_type_value = 'Motorcycle';
+List vehicles = [];
+List<String> vehicleType = [];
+late Map<String, int> vehicleMap;
+String vehicle_type_value = "";
 
 TextEditingController vehicleplate_value = TextEditingController();
 

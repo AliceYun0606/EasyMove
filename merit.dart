@@ -1,19 +1,15 @@
-import 'package:driver_integrated/merit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:getwidget/getwidget.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
+import 'package:driver_integrated/my_api_service.dart';
 import 'package:driver_integrated/driver.dart';
-import 'package:driver_integrated/withdrawal.dart';
+
 
 int? merit_value;
 String display_merit_value = "";
 List<dynamic>? merits;
 
 class Merit extends StatefulWidget {
-  final Map<String, dynamic> text;
-  const Merit(this.text);
   @override
   meritPageState createState() {
     return meritPageState();
@@ -21,16 +17,8 @@ class Merit extends StatefulWidget {
 }
 
 class meritPageState extends State<Merit> {
-  @override
-  void initState() {
-    super.initState();
-
-    final data = widget.text;
-    print(widget.text["merit"]);
-    // final merit_value = (data?["merit"]);
-    // final merits = (data?["merits"]);
-    // final display_merit_value = merit_value.toString()
-  }
+  Map<String, dynamic> meritMap = {};
+  Driver driver = Driver();
 
   @override
   Widget build(BuildContext context) {
@@ -54,56 +42,66 @@ class meritPageState extends State<Merit> {
                 ),
                 _headings(),
                 _meritlist(),
-
               ],
             )));
   }
 
+  Future<List<dynamic>> initMerit() async{
+    meritMap = await MyApiService.getMeritStatement(driver.id.toString());
+    List<dynamic> meritData = meritMap["merits"];
+    return meritData;
+  }
+
   //display merit score
   Widget _meritscore() {
-    return Container(
-      margin: EdgeInsets.only(left: 50, right: 50, top: 20),
-      padding: EdgeInsets.only(top: 15, bottom: 15),
-      decoration: BoxDecoration(
-          color: Colors.white,
-          border: Border.all(color: Colors.black, width: 0.1),
-          borderRadius: BorderRadius.circular(5.0),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.5),
-              spreadRadius: 5,
-              blurRadius: 7,
-            )
-          ]
-      ),
-      child: Column(
-        children: [
-          Container(
-            height: 70,
-            child: Row(
-              mainAxisSize: MainAxisSize.max,
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                _meritvalue(),
-                // Image.asset('assets/images/merit.png'),
-              ],
-            ),
+    return FutureBuilder(
+      future: initMerit(),
+      builder: (BuildContext context, AsyncSnapshot<List<dynamic>> snapshot) {
+        return Container(
+          margin: EdgeInsets.only(left: 50, right: 50, top: 20),
+          padding: EdgeInsets.only(top: 15, bottom: 15),
+          decoration: BoxDecoration(
+              color: Colors.white,
+              border: Border.all(color: Colors.black, width: 0.1),
+              borderRadius: BorderRadius.circular(5.0),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.5),
+                  spreadRadius: 5,
+                  blurRadius: 7,
+                )
+              ]
           ),
-          Text("MERIT SCORE",
-            style: TextStyle(fontSize: 20, color: Colors.orange),),
-        ],
-      ),
+          child: Column(
+            children: [
+              Container(
+                height: 70,
+                child: Row(
+                  mainAxisSize: MainAxisSize.max,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    _meritvalue(),
+                  ],
+                ),
+              ),
+              const Text("MERIT SCORE",
+                style: TextStyle(fontSize: 20, color: Colors.orange),),
+            ],
+          ),
+        );
+      }
     );
   }
 
   //merit score value
   Widget _meritvalue() {
-    if (widget.text["merit"].toString() != null) {
-      return Text(widget.text["merit"].toString(),
-          style: TextStyle(fontSize: 50, color: Colors.orange));
+    if (meritMap["merit"].toString() != "null") {
+      return Text(meritMap["merit"].toString(),
+          style: const TextStyle(fontSize: 50, color: Colors.orange));
     } else {
-      return Text("Loading");
+      return const Text("Loading...",
+          style: TextStyle(fontSize: 36, color: Colors.orange));
     }
   }
 
@@ -125,71 +123,102 @@ class meritPageState extends State<Merit> {
 
   //show merit list depending on filter
   Widget _meritlist() {
-    if (widget.text["message"] == "Get merit successfully" &&
-        month_value == "--------" && year_value == "----") {
-      return default_meritlist();
-    } else if (year_value != "----" && month_value == "--------") {
+    if (year_value != "----" && month_value == "--------") {
       return year_meritlist();
     } else if (year_value != "----" && month_value != "--------") {
       return month_meritlist();
     } else {
-      return Text("Loading");
+      return default_meritlist();
     }
   }
 
-
   Widget default_meritlist() {
-    return ListView.builder(
-        scrollDirection: Axis.vertical,
-        shrinkWrap: true,
-        itemCount: widget.text.length+1,
-        itemBuilder: (BuildContext context, int index) {
-          return Container(
-            height: 50,
-            padding: EdgeInsets.only(left: 45, right: 50),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Text('${widget.text["merits"][index]["date"]}'),),
-                Expanded(
-                  child: Text('${widget.text["merits"][index]["note"]}'),),
-                Expanded(child: Text(
-                    '${widget.text["merits"][index]["order_id"]}'),),
-                Text('${widget.text["merits"][index]["points"]}p'),
-              ],
-            ),
+    return FutureBuilder(
+      future: initMerit(),
+      builder: (BuildContext context, AsyncSnapshot<List<dynamic>> snapshot) {
+        if(snapshot.hasData) {
+          return ListView.builder(
+              physics: const NeverScrollableScrollPhysics(),
+              scrollDirection: Axis.vertical,
+              shrinkWrap: true,
+              itemCount: snapshot.data!.length,
+              itemBuilder: (BuildContext context, int index) {
+                return Container(
+                  height: 50,
+                  padding: EdgeInsets.only(left: 45, right: 50),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Text('${meritMap["merits"][index]["date"]}'),
+                      ),
+                      Expanded(
+                        child: Text('${meritMap["merits"][index]["note"]}'),
+                      ),
+                      Expanded(
+                        child: meritMap["merits"][index]["order_id"] == null ?
+                          const Text("ad-hoc") :
+                          Text('${meritMap["merits"][index]["order_id"]}'),
+                      ),
+                      Text('${meritMap["merits"][index]["points"]}p'),
+                    ],
+                  ),
+                );
+              }
           );
+        }else{
+          return const Text("Loading");
         }
+      }
     );
   }
 
   Widget year_meritlist() {
-    return ListView.builder(
-        scrollDirection: Axis.vertical,
-        shrinkWrap: true,
-        itemCount: widget.text.length+1,
-        itemBuilder: (BuildContext context, int index) {
-          return Container(
-            height: 50,
-            padding: EdgeInsets.only(left: 45, right: 50),
-            child: _filter_list_by_year(widget.text, index),
+    return FutureBuilder(
+      future: initMerit(),
+      builder: (BuildContext context, AsyncSnapshot<List<dynamic>> snapshot) {
+        if(snapshot.hasData) {
+          return ListView.builder(
+              physics: const NeverScrollableScrollPhysics(),
+              scrollDirection: Axis.vertical,
+              shrinkWrap: true,
+              itemCount: snapshot.data!.length,
+              itemBuilder: (BuildContext context, int index) {
+                return Container(
+                  height: 50,
+                  padding: EdgeInsets.only(left: 45, right: 50),
+                  child: _filter_list_by_year(meritMap, index),
+                );
+              }
           );
+        }else{
+          return const Text("Loading");
         }
+      }
     );
   }
 
   Widget month_meritlist() {
-    return ListView.builder(
-        scrollDirection: Axis.vertical,
-        shrinkWrap: true,
-        itemCount: widget.text.length+1,
-        itemBuilder: (BuildContext context, int index) {
-          return Container(
-            height: 50,
-            padding: EdgeInsets.only(left: 45, right: 50),
-            child: _filter_list_by_month(widget.text, index),
+    return FutureBuilder(
+      future: initMerit(),
+      builder: (BuildContext context, AsyncSnapshot<List<dynamic>> snapshot) {
+        if(snapshot.hasData) {
+          return ListView.builder(
+              physics: const NeverScrollableScrollPhysics(),
+              scrollDirection: Axis.vertical,
+              shrinkWrap: true,
+              itemCount: snapshot.data!.length,
+              itemBuilder: (BuildContext context, int index) {
+                return Container(
+                  height: 50,
+                  padding: EdgeInsets.only(left: 45, right: 50),
+                  child: _filter_list_by_month(meritMap, index),
+                );
+              }
           );
+        }else{
+          return const Text("Loading");
         }
+      }
     );
   }
 
@@ -202,7 +231,7 @@ class meritPageState extends State<Merit> {
           Expanded(child: Text('${text["merits"][index]["date"]}'),),
           Expanded(child: Text('${text["merits"][index]["note"]}'),),
           Expanded(child: Text('${text["merits"][index]["order_id"]}'),),
-          Text('${widget.text["merits"][index]["points"]}p'),
+          Text('${meritMap["merits"][index]["points"]}p'),
         ],
       );
     } else {
@@ -228,11 +257,11 @@ class meritPageState extends State<Merit> {
     if (month_value == "July") {
       month_value_num = 7;
     } else if (month_value == "August") {
-        month_value_num = 8;
+      month_value_num = 8;
     } else if (month_value == "September") {
-        month_value_num = 9;
+      month_value_num = 9;
     } else if (month_value == "October"){
-    month_value_num = 10;
+      month_value_num = 10;
     } else if(month_value == "November"){
       month_value_num = 11;
     } else if(month_value == "December"){
@@ -245,7 +274,7 @@ class meritPageState extends State<Merit> {
           Expanded(child: Text('${text["merits"][index]["date"]}'),),
           Expanded(child: Text('${text["merits"][index]["note"]}'),),
           Expanded(child: Text('${text["merits"][index]["order_id"]}'),),
-          Text('${widget.text["merits"][index]["points"]}p'),
+          Text('${meritMap["merits"][index]["points"]}p'),
         ],
       );
     } else {
@@ -354,5 +383,3 @@ var year = [
   '2018',
 ];
 String year_value = '----';
-
-

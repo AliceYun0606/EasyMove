@@ -77,7 +77,9 @@ class signupFormState extends State<signupForm>{
     regions = await MyApiService.getRegions();
     regionMap = regions[0];
     region = regions[1];
-    region_value = region[0];
+    if(region_value == "") {
+      region_value = region[0];
+    }
     return regions;
   }
 
@@ -242,7 +244,7 @@ class signupFormState extends State<signupForm>{
             //input for front of driver's IC
             Column(
               children: [
-                Text("Front Of Driver's I.C.",style: TextStyle(fontSize: 18),),
+                Text("Front Of Driver's I.C. *",style: TextStyle(fontSize: 18),),
                 GFButton(
                   color: Colors.orange,
                   onPressed: () {
@@ -277,7 +279,7 @@ class signupFormState extends State<signupForm>{
             //input for back of driver's IC
             Column(
               children: [
-                Text("Back Of Driver's I.C.",style: TextStyle(fontSize: 18),),
+                Text("Back Of Driver's I.C. *",style: TextStyle(fontSize: 18),),
                 GFButton(
                   color: Colors.orange,
                   onPressed: () {
@@ -324,7 +326,7 @@ var inputfullname = TextFormField(
   decoration: const InputDecoration(
     // icon: const Icon(Icons.person),
     hintText: 'Enter your name',
-    labelText: 'Full Name As Per IC',
+    labelText: 'Full Name As Per IC *',
   ),
   validator: (value){
     if (value == null || value.isEmpty){
@@ -343,7 +345,7 @@ var inputusername = TextFormField(
   decoration: const InputDecoration(
     // icon: const Icon(Icons.person),
     hintText: 'Create your username',
-    labelText: 'Login Username',
+    labelText: 'Login Username *',
   ),
   validator: (value){
     if (value == null || value.isEmpty){
@@ -363,7 +365,7 @@ var inputpassword = TextFormField(
   decoration: const InputDecoration(
     // icon: const Icon(Icons.person),
     hintText: 'Create your password',
-    labelText: 'Login Password',
+    labelText: 'Login Password *',
   ),
   validator: (value){
     if (value == null || value.isEmpty){
@@ -384,7 +386,7 @@ var inputicnumber = TextFormField(
   decoration: const InputDecoration(
     // icon: const Icon(Icons.person),
     hintText: 'Enter your I.C. number',
-    labelText: 'Identity Card Number',
+    labelText: 'Identity Card Number *',
   ),
   validator: (value){
     if (value == null || value.isEmpty){
@@ -404,7 +406,7 @@ var inputmobilenumber = TextFormField(
   decoration: const InputDecoration(
     // icon: const Icon(Icons.person),
     hintText: 'Enter your mobile number',
-    labelText: 'Mobile Phone Number',
+    labelText: 'Mobile Phone Number *',
   ),
   validator: (value){
     if (value == null || value.isEmpty){
@@ -424,7 +426,7 @@ var inputemergencycontactmobilenumber = TextFormField(
   decoration: const InputDecoration(
     // icon: const Icon(Icons.person),
     hintText: 'Enter your emergency contact mobile number',
-    labelText: 'Emergency Contact Mobile Phone Number',
+    labelText: 'Emergency Contact Mobile Phone Number *',
   ),
   validator: (value){
     if (value == null || value.isEmpty){
@@ -441,14 +443,6 @@ var employment_type = [
 ];
 String employment_type_value = 'Part-Time';
 
-
-//region drop down list values
-// var region = [
-//   'Region 1',
-//   'Region 2',
-//   'Region 3',
-// ];
-// String region_value = 'Region 1';
 late Map<String, int> regionMap;
 List regions = [];
 List<String> region = [];

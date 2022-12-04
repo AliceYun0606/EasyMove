@@ -1,3 +1,4 @@
+import 'package:driver_integrated/notification_service.dart';
 import 'package:flutter/material.dart';
 import 'package:getwidget/getwidget.dart';
 import 'package:driver_integrated/NavBar.dart';
@@ -13,6 +14,7 @@ String? response_message;
 
 class LoginPage extends StatelessWidget {
   Driver driver = Driver();
+  NotificationService notificationService = NotificationService();
 
   @override
   Widget build(BuildContext context) {
@@ -30,6 +32,8 @@ class LoginPage extends StatelessWidget {
       int vehicleType = auth_user["vehicle_type"];
       String name = auth_user["name"];
       driver.initializeDriver(id, region, vehicleType, name);
+      notificationService.init();
+      notificationService.start();
 
       response_message = (data["auth_user"]["message"]);
       print(response.statusCode);

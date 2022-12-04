@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'dart:io';
-//import 'package:driver_integrated/list.dart';
 import 'package:driver_integrated/order_details.dart';
 import 'package:driver_integrated/my_api_service.dart';
 import 'package:driver_integrated/driver.dart';
@@ -39,6 +38,7 @@ class _MyListPageState extends State<OrderList> with TickerProviderStateMixin {
   final ImagePicker imagePicker = ImagePicker();
 
   Future<List<MyOrder>> populateOrders(String orderStatus, bool assign) async{
+    print("-------------------------------");
     List<MyOrder> myOrders = [];
     List orderIds = await MyApiService.getOrdersId(driver.id, orderStatus);
     for (var oid in orderIds) {
@@ -71,20 +71,24 @@ class _MyListPageState extends State<OrderList> with TickerProviderStateMixin {
           customerName,
           phone,
           zone,
-          data["assign"] != null,
+          data["assign"] != null && data["assign"] != 0,
           originLatitude,
           originLongitude,
           destinationLatitude,
           destinationLongitude);
 
-      if(assign && orderStatus == "news"){
-        if(myOrder.isAssigned){
-          if(data["assign"] == driver.id) {
+      //print("id:${myOrder.id}, assign:${data["assign"]}, time:${myOrder.collectTime}, status:${myOrder.status}");
+
+      if(assign && orderStatus == "new"){
+        if(myOrder.isAssigned) {
+          if (data["assign"] == driver.id) {
             myOrders.add(myOrder);
           }
         }
       }else{
-        myOrders.add(myOrder);
+        if(!myOrder.isAssigned) {
+          myOrders.add(myOrder);
+        }
       }
     }
 
@@ -176,12 +180,13 @@ class _MyListPageState extends State<OrderList> with TickerProviderStateMixin {
                             "Distance:${data[index].distance} KM\n"
                             "Collect Time: ${data[index].collectTime}\n"
                             "Delivery Time: ${data[index].deliverTime}",
-                      data[index]
+                      data[index],
+                      false
                     );
                   } else {
                     return ElevatedButton(
                         onPressed: () => setState(() {}),
-                        child: const Text("Refresh"));
+                        child: const Text("Refresh", style: TextStyle(fontSize: 20),));
                   }
                 },
               );
@@ -214,12 +219,13 @@ class _MyListPageState extends State<OrderList> with TickerProviderStateMixin {
                           "Distance: ${data[index].distance} KM\n"
                           "Collect Time: ${data[index].collectTime}\n"
                           "Delivery Time: ${data[index].deliverTime}",
-                      data[index]
+                      data[index],
+                      false
                     );
                   }else{
                     return ElevatedButton(
                         onPressed:() => setState(() {}),
-                        child: const Text("Refresh"));
+                        child: const Text("Refresh", style: TextStyle(fontSize: 20),));
                   }
                 },
               );
@@ -253,12 +259,13 @@ class _MyListPageState extends State<OrderList> with TickerProviderStateMixin {
                             "Status: ${data[index].status}\n"
                             "Collect Time: ${data[index].collectTime}\n"
                             "Delivery Time: ${data[index].deliverTime}",
-                      data[index]
+                      data[index],
+                      false
                     );
                   }else{
                     return ElevatedButton(
                         onPressed:() => setState(() {}),
-                        child: const Text("Refresh"));
+                        child: const Text("Refresh", style: TextStyle(fontSize: 20),));
                   }
                 },
               );
@@ -292,12 +299,13 @@ class _MyListPageState extends State<OrderList> with TickerProviderStateMixin {
                           "Status: ${data[index].status}\n"
                           "Collect Time: ${data[index].collectTime}\n"
                           "Delivery Time: ${data[index].deliverTime}",
-                      data[index]
+                      data[index],
+                      true
                     );
                   }else{
                     return ElevatedButton(
                       onPressed:() => setState(() {}),
-                      child: const Text("Refresh"));
+                      child: const Text("Refresh", style: TextStyle(fontSize: 20),));
                   }
                 },
               );
@@ -308,7 +316,7 @@ class _MyListPageState extends State<OrderList> with TickerProviderStateMixin {
     );
   }
 
-  Widget myList(String child, MyOrder order){
+  Widget myList(String child, MyOrder order, bool limitDirection){
     return Container(
       margin: const EdgeInsets.only(left: 10, right: 10, bottom: 10),
       decoration: BoxDecoration(
@@ -323,17 +331,18 @@ class _MyListPageState extends State<OrderList> with TickerProviderStateMixin {
         ],
       ),
       child: Dismissible(
+        direction: limitDirection? DismissDirection.startToEnd : DismissDirection.horizontal,
         onDismissed: (direction) {
           if (direction == DismissDirection.startToEnd) {
             Navigator.push(
                 context,
                 MaterialPageRoute(
                     builder: (context) => Order_details(order: order,)));
-          } else if (direction == DismissDirection.endToStart) {
+          }else if (direction == DismissDirection.endToStart) {
             if(order.isAssigned && order.status == "Ordered") {
               assignedAlertBox(order.id);
             }else{
-              myAlertBox(order.id, myAlertBoxAction(order.status));
+              orderActionAlertBox(order.id, myAlertBoxAction(order.status));
             }
           }
         },
@@ -415,7 +424,7 @@ class _MyListPageState extends State<OrderList> with TickerProviderStateMixin {
     }
   }
 
-  void myAlertBox(int orderId, String action) {
+  void orderActionAlertBox(int orderId, String action) {
     showDialog(
       context: context,
       builder: (context) {
@@ -427,23 +436,20 @@ class _MyListPageState extends State<OrderList> with TickerProviderStateMixin {
             child: myAlertBoxTitle(action),
           ),
           actions:[
-            ElevatedButton(
+            TextButton(
               onPressed: () {
                 Navigator.of(context).pop(false);
                 setState(() {});
               },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.redAccent,
-              ),
               child: const Text(
                 "No",
                 style: TextStyle(
-                  color: Colors.white,
+                  color: Colors.redAccent,
                   fontSize: 20,
                 ),
               ),
             ),
-            ElevatedButton(
+            TextButton(
               onPressed: () {
                 if(action != "pod") {
                   MyApiService.updateOrder(driver.id, orderId, action);
@@ -454,13 +460,10 @@ class _MyListPageState extends State<OrderList> with TickerProviderStateMixin {
                   podImageAlertBox(orderId);
                 }
               },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF7BC043),
-              ),
               child: const Text(
                 "Yes",
                 style: TextStyle(
-                  color: Colors.white,
+                  color: Color(0xFF7BC043),
                   fontSize: 20,
                 ),
               ),
@@ -484,32 +487,28 @@ class _MyListPageState extends State<OrderList> with TickerProviderStateMixin {
                 Navigator.of(context).pop();
                 setState(() {});
               },
-              child: ElevatedButton(
-                onPressed: (){},
-                child: Row(
+              child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: const[
-                    Icon(Icons.image, color: Colors.white, size: 28,),
-                    Text("From Gallery", style: TextStyle(color: Colors.white, fontSize: 20),)
+                    Icon(Icons.image, size: 28,),
+                    Text("From Gallery", style: TextStyle(fontSize: 20),)
                   ],
                 ),
               ),
-            ),
             SimpleDialogOption(
               onPressed: (){
                 getImage(ImageSource.camera, orderId);
+                Navigator.of(context).pop();
+                setState(() {});
               },
-              child: ElevatedButton(
-                onPressed: (){},
-                child: Row(
+              child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: const[
-                    Icon(Icons.camera, color: Colors.white, size: 28,),
-                    Text("Camera", style: TextStyle(color: Colors.white, fontSize: 20),)
+                    Icon(Icons.camera, size: 28,),
+                    Text("Camera", style: TextStyle(fontSize: 20),)
                   ],
                 ),
               ),
-            )
           ],
         );
       }
@@ -530,19 +529,19 @@ class _MyListPageState extends State<OrderList> with TickerProviderStateMixin {
           actions: [
             TextButton(
               onPressed: (){
-                MyApiService.updateOrder(driver.id, oid, "accept");
-                Navigator.of(context).pop();
-                setState(() {});
-              },
-              child: const Text("Accept", style: TextStyle(fontSize: 16))
-            ),
-            TextButton(
-              onPressed: (){
                 MyApiService.updateOrder(driver.id, oid, "decline");
                 Navigator.of(context).pop();
                 setState(() {});
               },
-              child: const Text("Decline", style: TextStyle(fontSize: 16))
+              child: const Text("Decline", style: TextStyle(fontSize: 20, color: Colors.redAccent))
+            ),
+            TextButton(
+                onPressed: (){
+                  MyApiService.updateOrder(driver.id, oid, "accept");
+                  Navigator.of(context).pop();
+                  setState(() {});
+                },
+                child: const Text("Accept", style: TextStyle(fontSize: 20, color: Color(0xFF7BC043),))
             ),
           ],
         );

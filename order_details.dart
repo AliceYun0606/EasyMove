@@ -1,16 +1,10 @@
+import 'package:driver_integrated/order.dart';
 import 'package:flutter/material.dart';
 import 'package:driver_integrated/my_order.dart';
-//import 'package:sampleproject_1/list_view.dart';
 import 'package:map_launcher/map_launcher.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:driver_integrated/driver.dart';
 import 'package:driver_integrated/my_api_service.dart';
-import 'package:driver_integrated/my_order_details.dart';
-import 'package:driver_integrated/_order_json_format.dart';
-
-// void main() => runApp(const Order_details(
-//   oid: 00000406,
-// ));
 
 class Order_details extends StatelessWidget {
   const Order_details({super.key, required this.order});
@@ -33,8 +27,10 @@ class _RowOrder extends StatelessWidget {
 
   openMapsList(context) async {
     try {
-      final oCoords = Coords(double.parse(order.oLat), double.parse(order.oLon));
-      final dCoords = Coords(double.parse(order.dLat), double.parse(order.dLon));
+      final oCoords =
+      Coords(double.parse(order.oLat), double.parse(order.oLon));
+      final dCoords =
+      Coords(double.parse(order.dLat), double.parse(order.dLon));
       final availableMaps = await MapLauncher.installedMaps;
 
       showModalBottomSheet(
@@ -52,11 +48,10 @@ class _RowOrder extends StatelessWidget {
                         //   title: title,
                         // ),
                         onTap: () => map.showDirections(
-                          origin: oCoords,
-                          destination: dCoords,
-                          originTitle: order.origin,
-                          destinationTitle: order.destination
-                        ),
+                            origin: oCoords,
+                            destination: dCoords,
+                            originTitle: order.origin,
+                            destinationTitle: order.destination),
                         title: Text(map.mapName),
                         leading: SvgPicture.asset(
                           map.icon,
@@ -80,7 +75,7 @@ class _RowOrder extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        /*leading: IconButton(
+        leading: IconButton(
             icon: Icon(
               Icons.arrow_back,
               color: Colors.black,
@@ -90,8 +85,8 @@ class _RowOrder extends StatelessWidget {
                   context,
                   MaterialPageRoute(
                       builder: (context) =>
-                          const OrderList(title: 'Order List View')));
-            })),*/
+                          const OrderPage()));
+            })),
         title: const Text(
           'Order Details',
           style: TextStyle(color: Colors.black),
@@ -129,10 +124,10 @@ class _RowOrder extends StatelessWidget {
                     Row(
                       children: [
                         Container(
-                          padding: const EdgeInsets.fromLTRB(220, 5, 5, 0),
+                          padding: const EdgeInsets.fromLTRB(185, 5, 5, 0),
                           child: Text(order.id.toString(),
                               overflow: TextOverflow.ellipsis,
-                              maxLines: 2,
+                              maxLines: 1,
                               style: const TextStyle(
                                 color: Colors.orange,
                                 fontSize: 18,
@@ -154,7 +149,7 @@ class _RowOrder extends StatelessWidget {
                       color: Colors.grey.withOpacity(0.5),
                       spreadRadius: 2,
                       blurRadius: 2,
-                      offset: Offset(0, 3),
+                      offset: const Offset(0, 3),
                     )
                   ],
                 ),
@@ -169,35 +164,40 @@ class _RowOrder extends StatelessWidget {
                       color: Colors.orange,
                       size: 50.0,
                     ),
-                    Column(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.fromLTRB(10, 15, 60, 0),
-                          child: const Text('Date & Time:',
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 2,
-                              style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold)),
-                        ),
-                        Column(
-                          children: [
-                            Container(
-                              padding:
-                              const EdgeInsets.only(left: 10, right: 10),
-                              child: Text(order.createdTime,
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 2,
-                                  style: const TextStyle(
+                    Expanded(
+                      child: Column(
+                        children: [
+                          const FittedBox(
+                            child: Padding(
+                              padding: EdgeInsets.only(top: 10, bottom: 5),
+                              child: Text(
+                                'Date & Time:',
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                                style: TextStyle(
                                     color: Colors.black,
                                     fontSize: 20,
-                                  )),
+                                    fontWeight: FontWeight.bold),
+                              ),
                             ),
-                          ],
-                        ),
-                      ],
-                    ),
+                          ),
+                          Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.only(top: 0, bottom: 5),
+                              child: Text(
+                                order.createdTime,
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                                style: const TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 20,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
                   ],
                 ),
               ),
@@ -212,7 +212,7 @@ class _RowOrder extends StatelessWidget {
                       color: Colors.grey.withOpacity(0.5),
                       spreadRadius: 2,
                       blurRadius: 2,
-                      offset: Offset(0, 3),
+                      offset: const Offset(0, 3),
                     )
                   ],
                 ),
@@ -225,35 +225,40 @@ class _RowOrder extends StatelessWidget {
                       color: Colors.orange,
                       size: 50.0,
                     ),
-                    Column(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.fromLTRB(10, 15, 0, 0),
-                          child: const Text('Merchant:',
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 2,
-                              style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold)),
-                        ),
-                        Column(
-                          children: [
-                            Container(
-                              padding:
-                              const EdgeInsets.only(left: 10, right: 10),
-                              child: Text(order.branchName,
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 2,
-                                  style: const TextStyle(
+                    Expanded(
+                      child: Column(
+                        children: [
+                          const FittedBox(
+                            child: Padding(
+                              padding: EdgeInsets.only(top: 10, bottom: 5),
+                              child: Text(
+                                'Merchant:',
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                                style: TextStyle(
                                     color: Colors.black,
                                     fontSize: 20,
-                                  )),
+                                    fontWeight: FontWeight.bold),
+                              ),
                             ),
-                          ],
-                        ),
-                      ],
-                    ),
+                          ),
+                          Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.only(top: 0, bottom: 5),
+                              child: Text(
+                                order.branchName,
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                                style: const TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 20,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
                   ],
                 ),
               ),
@@ -268,7 +273,7 @@ class _RowOrder extends StatelessWidget {
                       color: Colors.grey.withOpacity(0.5),
                       spreadRadius: 2,
                       blurRadius: 2,
-                      offset: Offset(0, 3),
+                      offset: const Offset(0, 3),
                     )
                   ],
                 ),
@@ -281,34 +286,37 @@ class _RowOrder extends StatelessWidget {
                       color: Colors.orange,
                       size: 50.0,
                     ),
-                    Column(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.fromLTRB(10, 15, 0, 0),
-                          child: const Text("Customer's name:",
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 2,
-                              style: TextStyle(
+                    Expanded(
+                      child: Column(
+                        children: [
+                          const FittedBox(
+                            child: Padding(
+                              padding: EdgeInsets.only(top: 10, bottom: 5),
+                              child: Text("Customer's name:",
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 1,
+                                  style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold)),
+                            ),
+                          ),
+                          Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.only(top: 0, bottom: 5),
+                              child: Text(
+                                order.customerName,
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                                style: const TextStyle(
                                   color: Colors.black,
                                   fontSize: 20,
-                                  fontWeight: FontWeight.bold)),
-                        ),
-                        Column(
-                          children: [
-                            Container(
-                              padding:
-                              const EdgeInsets.only(left: 10, right: 60),
-                              child: Text(order.customerName,
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 2,
-                                  style: const TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 20,
-                                  )),
+                                ),
+                              ),
                             ),
-                          ],
-                        ),
-                      ],
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
@@ -324,7 +332,7 @@ class _RowOrder extends StatelessWidget {
                       color: Colors.grey.withOpacity(0.5),
                       spreadRadius: 2,
                       blurRadius: 2,
-                      offset: Offset(0, 3),
+                      offset: const Offset(0, 3),
                     )
                   ],
                 ),
@@ -337,34 +345,39 @@ class _RowOrder extends StatelessWidget {
                       color: Colors.orange,
                       size: 50.0,
                     ),
-                    Column(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.fromLTRB(10, 15, 0, 0),
-                          child: const Text("Phone number :",
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 2,
-                              style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold)),
-                        ),
-                        Column(
-                          children: [
-                            Container(
-                              padding:
-                              const EdgeInsets.only(left: 10, right: 30),
-                              child: Text(order.phone,
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 2,
-                                  style: const TextStyle(
+                    Expanded(
+                      child: Column(
+                        children: [
+                          const FittedBox(
+                            child: Padding(
+                              padding: EdgeInsets.only(top: 10, bottom: 5),
+                              child: Text(
+                                "Phone number :",
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                                style: TextStyle(
                                     color: Colors.black,
                                     fontSize: 20,
-                                  )),
+                                    fontWeight: FontWeight.bold),
+                              ),
                             ),
-                          ],
-                        ),
-                      ],
+                          ),
+                          Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.only(top: 0, bottom: 5),
+                              child: Text(
+                                order.phone,
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                                style: const TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 20,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
@@ -380,53 +393,60 @@ class _RowOrder extends StatelessWidget {
                       color: Colors.grey.withOpacity(0.5),
                       spreadRadius: 2,
                       blurRadius: 2,
-                      offset: Offset(0, 3),
+                      offset: const Offset(0, 3),
                     )
                   ],
                 ),
                 margin: const EdgeInsets.all(10),
                 child: Row(
                   children: [
-                    const Padding(padding: EdgeInsets.only(left: 5, right: 0)),
+                    const Padding(
+                      padding: EdgeInsets.only(left: 5, right: 0),
+                    ),
                     const Icon(
                       Icons.location_city,
                       color: Colors.orange,
                       size: 50.0,
                     ),
-                    Column(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.fromLTRB(10, 15, 0, 0),
-                          child: const Text("Zone :",
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 2,
-                              style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold)),
-                        ),
-                        Column(
-                          children: [
-                            Container(
-                              padding:
-                              const EdgeInsets.only(left: 10, right: 10),
-                              child: Text(order.zone,
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 2,
-                                  style: const TextStyle(
+                    Expanded(
+                      child: Column(
+                        children: [
+                          const FittedBox(
+                            child: Padding(
+                              padding: EdgeInsets.only(top: 10, bottom: 5),
+                              child: Text(
+                                "Zone :",
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                                style: TextStyle(
                                     color: Colors.black,
                                     fontSize: 20,
-                                  )),
+                                    fontWeight: FontWeight.bold),
+                              ),
                             ),
-                          ],
-                        ),
-                      ],
+                          ),
+                          Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.only(top: 0, bottom: 5),
+                              child: Text(
+                                order.zone,
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                                style: const TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 20,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
               ),
               Container(
-                height: 70,
+                //height: 70,
                 //color: const Color.fromARGB(255, 246, 232, 206),
                 decoration: BoxDecoration(
                   borderRadius: const BorderRadius.only(
@@ -438,7 +458,7 @@ class _RowOrder extends StatelessWidget {
                       color: Colors.grey.withOpacity(0.5),
                       spreadRadius: 2,
                       blurRadius: 2,
-                      offset: Offset(3, 0),
+                      offset: const Offset(3, 0),
                     )
                   ],
                 ),
@@ -451,40 +471,47 @@ class _RowOrder extends StatelessWidget {
                       color: Colors.orange,
                       size: 50.0,
                     ),
-                    Column(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
-                          child: const Text('Pick Up Location:',
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 2,
-                              style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold)),
-                        ),
-                        Column(
-                          children: [
-                            Container(
-                              padding:
-                              const EdgeInsets.only(left: 10, right: 70),
-                              child: Text(order.origin,
+                    Expanded(
+                      child: Column(
+                        children: [
+                          const FittedBox(
+                            child: Padding(
+                              padding: EdgeInsets.only(top: 10, bottom: 5),
+                              child: Text(
+                                'Pick Up Location:',
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                                style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          ),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  order.origin,
                                   overflow: TextOverflow.ellipsis,
-                                  maxLines: 2,
+                                  maxLines: 10,
+                                  softWrap: false,
                                   style: const TextStyle(
                                     color: Colors.black,
                                     fontSize: 20,
-                                  )),
-                            ),
-                          ],
-                        ),
-                      ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
               ),
               Container(
-                height: 70,
+                //height: 70,
                 decoration: BoxDecoration(
                   borderRadius: const BorderRadius.only(
                       bottomLeft: Radius.circular(20),
@@ -495,7 +522,7 @@ class _RowOrder extends StatelessWidget {
                       color: Colors.grey.withOpacity(0.5),
                       spreadRadius: 2,
                       blurRadius: 2,
-                      offset: Offset(3, 3),
+                      offset: const Offset(3, 3),
                     )
                   ],
                 ),
@@ -508,34 +535,41 @@ class _RowOrder extends StatelessWidget {
                       color: Colors.orange,
                       size: 50.0,
                     ),
-                    Column(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
-                          child: const Text('Drop off Location:',
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 2,
-                              style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold)),
-                        ),
-                        Column(
-                          children: [
-                            Container(
-                              padding:
-                              const EdgeInsets.only(left: 10, right: 70),
-                              child: Text(order.destination,
+                    Expanded(
+                      child: Column(
+                        children: [
+                          const FittedBox(
+                            child: Padding(
+                              padding: EdgeInsets.only(top: 10, bottom: 5),
+                              child: Text(
+                                'Drop off Location:',
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                                style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          ),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  order.destination,
                                   overflow: TextOverflow.ellipsis,
-                                  maxLines: 2,
+                                  maxLines: 10,
+                                  softWrap: false,
                                   style: const TextStyle(
                                     color: Colors.black,
                                     fontSize: 20,
-                                  )),
-                            ),
-                          ],
-                        ),
-                      ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
@@ -550,7 +584,7 @@ class _RowOrder extends StatelessWidget {
                       color: Colors.grey.withOpacity(0.5),
                       spreadRadius: 2,
                       blurRadius: 2,
-                      offset: Offset(0, 3),
+                      offset: const Offset(0, 3),
                     )
                   ],
                 ),
@@ -563,36 +597,37 @@ class _RowOrder extends StatelessWidget {
                       color: Colors.orange,
                       size: 50.0,
                     ),
-                    Column(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.fromLTRB(10, 15, 0, 0),
-                          child: const Text('Trips Distance: ',
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 2,
-                              style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold)),
-                        ),
-                        Column(
-                          children: [
-                            Container(
-                              padding:
-                              const EdgeInsets.only(left: 10, right: 80),
+                    Expanded(
+                      child: Column(
+                        children: [
+                          const FittedBox(
+                            child: Padding(
+                              padding: EdgeInsets.only(top: 10, bottom: 5),
+                              child: Text('Trips Distance: ',
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 1,
+                                  style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold)),
+                            ),
+                          ),
+                          Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.only(top: 0, bottom: 5),
                               child: Text(
                                 "${order.distance.toString()} KM",
                                 overflow: TextOverflow.ellipsis,
-                                maxLines: 2,
+                                maxLines: 1,
                                 style: const TextStyle(
                                   color: Colors.black,
                                   fontSize: 20,
                                 ),
                               ),
                             ),
-                          ],
-                        ),
-                      ],
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
@@ -610,7 +645,7 @@ class _RowOrder extends StatelessWidget {
                       color: Colors.grey.withOpacity(0.5),
                       spreadRadius: 2,
                       blurRadius: 2,
-                      offset: Offset(3, 0),
+                      offset: const Offset(3, 0),
                     )
                   ],
                 ),
@@ -623,34 +658,39 @@ class _RowOrder extends StatelessWidget {
                       color: Colors.orange,
                       size: 50.0,
                     ),
-                    Column(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.fromLTRB(10, 10, 0, 0),
-                          child: const Text('Pick Up Time:',
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 2,
-                              style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold)),
-                        ),
-                        Column(
-                          children: [
-                            Container(
-                              padding:
-                              const EdgeInsets.only(left: 10, right: 40),
-                              child: Text(order.collectTime,
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 2,
-                                  style: const TextStyle(
+                    Expanded(
+                      child: Column(
+                        children: [
+                          const FittedBox(
+                            child: Padding(
+                              padding: EdgeInsets.only(top: 10, bottom: 5),
+                              child: Text(
+                                'Pick Up Time:',
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                                style: TextStyle(
                                     color: Colors.black,
                                     fontSize: 20,
-                                  )),
+                                    fontWeight: FontWeight.bold),
+                              ),
                             ),
-                          ],
-                        ),
-                      ],
+                          ),
+                          Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.only(top: 0, bottom: 5),
+                              child: Text(
+                                order.collectTime,
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                                style: const TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 20,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
@@ -667,7 +707,7 @@ class _RowOrder extends StatelessWidget {
                       color: Colors.grey.withOpacity(0.5),
                       spreadRadius: 2,
                       blurRadius: 2,
-                      offset: Offset(3, 3),
+                      offset: const Offset(3, 3),
                     )
                   ],
                 ),
@@ -680,98 +720,46 @@ class _RowOrder extends StatelessWidget {
                       color: Colors.orange,
                       size: 50.0,
                     ),
-                    Column(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.fromLTRB(10, 10, 0, 0),
-                          child: const Text('Delivery Time:',
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 2,
-                              style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold)),
-                        ),
-                        Column(
-                          children: [
-                            Container(
-                              padding:
-                              const EdgeInsets.only(left: 10, right: 40),
-                              child: Text(order.deliverTime,
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 2,
-                                  style: const TextStyle(
+                    Expanded(
+                      child: Column(
+                        children: [
+                          const FittedBox(
+                            child: Padding(
+                              padding: EdgeInsets.only(top: 10, bottom: 5),
+                              child: Text(
+                                'Delivery Time:',
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                                style: TextStyle(
                                     color: Colors.black,
                                     fontSize: 20,
-                                  )),
+                                    fontWeight: FontWeight.bold),
+                              ),
                             ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                height: 70,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  color: const Color.fromARGB(255, 246, 232, 206),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.5),
-                      spreadRadius: 2,
-                      blurRadius: 2,
-                      offset: Offset(0, 3),
-                    )
-                  ],
-                ),
-                margin: const EdgeInsets.fromLTRB(10, 10, 10, 0),
-                child: Row(
-                  children: [
-                    const Padding(padding: EdgeInsets.only(left: 5)),
-                    const Icon(
-                      Icons.attach_money,
-                      color: Colors.orange,
-                      size: 50.0,
-                    ),
-                    Column(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.fromLTRB(10, 15, 0, 0),
-                          child: const Text('Delivery Commission: ',
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 2,
-                              style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold)),
-                        ),
-                        Column(
-                          children: [
-                            Container(
-                              padding:
-                              const EdgeInsets.only(left: 10, right: 140),
-                              child: const Text(
-                                'RM 10',
+                          ),
+                          Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.only(top: 0, bottom: 5),
+                              child: Text(
+                                order.deliverTime,
                                 overflow: TextOverflow.ellipsis,
-                                maxLines: 2,
-                                style: TextStyle(
+                                maxLines: 1,
+                                style: const TextStyle(
                                   color: Colors.black,
                                   fontSize: 20,
                                 ),
                               ),
                             ),
-                          ],
-                        ),
-                      ],
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
               ),
               Center(
                 child: Container(
-                  margin: EdgeInsets.only(top: 30, bottom: 30),
+                  margin: const EdgeInsets.only(top: 30, bottom: 30),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(20),
                     color: Colors.orange,

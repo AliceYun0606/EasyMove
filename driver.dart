@@ -17,6 +17,7 @@ class Driver{
     this.region = region;
     this.vehicleType = vehicleType;
     this.name = name;
+    status = "off";
   }
 
 }

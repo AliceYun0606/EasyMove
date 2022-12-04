@@ -7,6 +7,7 @@ class MyLocationService{
   final List<Position> _positions = <Position>[];
   final GeolocatorPlatform _geolocatorPlatform = GeolocatorPlatform.instance;
   final Cron _cron = Cron();
+  late ScheduledTask _scheduledTask;
   late int driverId;
 
   MyLocationService._internal();
@@ -22,12 +23,12 @@ class MyLocationService{
     if (!hasPermission) {
       return;
     }
-    _cron.schedule(Schedule.parse('* * * * *'), () => _updatePosition());
+    _scheduledTask = _cron.schedule(Schedule.parse('* * * * *'), () => _updatePosition());
   }
 
   /// Stop automatic update of location.
   void stop(){
-    _cron.close();
+    _scheduledTask.cancel();
   }
 
   /// Get the latest recorded position.

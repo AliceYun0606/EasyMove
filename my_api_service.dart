@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'dart:io';
+import 'package:driver_integrated/notification_data.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'dart:convert';
@@ -23,8 +24,8 @@ class MyApiService{
       body: body
     );
 
-    // print(response.statusCode);
-    // print(response.body);
+    print(response.statusCode);
+    print(response.body);
   }
 
   /// Function to get the id of orders. [uid] is id of driver.
@@ -35,7 +36,6 @@ class MyApiService{
     final Map<String, String> body = {"uid": "$uid"};
     final response = await http.post(Uri.http(url, unencodedPath), body: body);
     final data = json.decode(response.body);
-    //print(data);
 
     String orderStatus = "";
     switch (status){
@@ -105,5 +105,78 @@ class MyApiService{
     return regions;
   }
 
+  static Future<List> getVehicles() async{
+    Map<String, int> vehicleMap = {};
+    List<String> vehicleList = [];
+    const String url = "awcgroup.com.my";
+    const String unencodedPath = "/easymovenpick.com/api/vehicle_types.php";
+    final response = await http.post(Uri.http(url, unencodedPath));
+    final data = json.decode(response.body);
+    print(data);
+
+    List elements = data["options"];
+    for(var e in elements){
+      Map<String, int> vehicle = {e["label"] : e["value"]};
+      vehicleMap.addAll(vehicle);
+      vehicleList.add(e["label"]);
+    }
+
+    List vehicles = [vehicleMap, vehicleList];
+    return vehicles;
+  }
+
+  static Future<Map<String, dynamic>> getMeritStatement(String userId) async {
+    const String url = "awcgroup.com.my";
+    const String unencodedPath = "/easymovenpick.com/api/merit_statement.php";
+    final Map<String, String> body = {'uid':userId};
+    final response = await http.post(
+        Uri.http(url,unencodedPath),
+        // headers: header,
+        body: body
+    );
+    final meritData = json.decode(response.body);
+    return meritData;
+  }
+
+  static Future<Map<String, dynamic>> getCommissionStatement(String userId) async {
+    const String url = "awcgroup.com.my";
+    const String unencodedPath = "/easymovenpick.com/api/commission_statement.php";
+    final Map<String, String> body = {'uid':userId};
+    final response = await http.post(
+        Uri.http(url, unencodedPath),
+        body: body
+    );
+    final walletData = json.decode(response.body);
+    return walletData;
+  }
+
+  static void updateDriverOnOff(int driverId, String onOff) async {
+    const String url = "awcgroup.com.my";
+    const String unencodedPath = "/easymovenpick.com/api/driver_on_off.php";
+    final Map<String,String> body = {'uid': "$driverId", 'onoff': onOff};
+    final response = await http.post(
+        Uri.http(url,unencodedPath),
+        body: body
+    );
+    print(response.statusCode);
+    print(response.body);
+  }
+
+  static Future<List<NotificationData>> fetchNoti(int driverId) async {
+    const String url = "awcgroup.com.my";
+    const String unencodedPath = "/easymovenpick.com/api/notification_statement.php";
+    final Map<String, String> body = ({'uid': "$driverId"});
+    final response = await http.post(
+        Uri.http(url, unencodedPath),
+        body: body
+    );
+
+    if (response.statusCode == 200) {
+      List data = json.decode(response.body);
+      return data.map((data) => NotificationData.fromJson(data)).toList();
+    } else {
+      throw Exception('Failed to load notification');
+    }
+  }
 
 }

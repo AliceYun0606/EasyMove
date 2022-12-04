@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:getwidget/getwidget.dart';
 import 'package:driver_integrated/merit.dart';
 import 'package:driver_integrated/wallet.dart';
+import 'package:driver_integrated/my_location_service.dart';
 import 'package:driver_integrated/driver.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
+import 'package:driver_integrated/my_api_service.dart';
+import 'package:driver_integrated/notification_service.dart';
+
+Driver driver = Driver();
 
 void main() {
   runApp(const MyApp());
@@ -31,53 +34,10 @@ class AccountPage extends StatefulWidget {
 }
 
 class _MyAccountPageState extends State<AccountPage> {
-  final String url = "awcgroup.com.my";
-  // //merit values
-  // int? merit_value;
-  // String display_merit_value = "";
-  // List<dynamic>? merits;
-  // //wallet values
-  // String? commission_value;
-  // String display_commission_value = "";
-  // int? wallet_merit_value;
-  // String display_wallet_merit_value = "";
-  // bool withdraw = false;
-  // List<dynamic>? commissions;
-  //values to send
-  Map<String, dynamic> wallet_data = new Map<String,dynamic>();
-  Map<String, dynamic> merit_data = new Map<String,dynamic>();
-  //http post functions
-  void makePostRequestMerit(String url, String unencodedPath, Map<String,String> requestBody) async {
-    final response = await http.post(
-        Uri.http(url,unencodedPath),
-        // headers: header,
-        body: requestBody
-    );
-    merit_data = json.decode(response.body);
-    // merit_value = (data["merit"]);
-    // merits = (data["merits"]);
-    // display_wallet_merit_value = merit_value.toString();
-    // print(merits?.length);
-    // print(response.statusCode);
-    print(merit_data);
-  }
+  MyLocationService myLocationService = MyLocationService(driver.id);
+  NotificationService notificationService = NotificationService();
 
-  void makePostRequestWallet(String url, String unencodedPath, Map<String,String> requestBody) async {
-    final response = await http.post(
-        Uri.http(url, unencodedPath),
-        // headers: header,
-        body: requestBody
-    );
-    wallet_data = json.decode(response.body);
-    // commission_value = (data["commission_bonus"]);
-    // wallet_merit_value = (data["withdrawable_merit"]);
-    // commissions = (data["commissions"]);
-    // display_commission_value = commission_value.toString();
-    // display_merit_value = merit_value.toString();
-    // print(response.statusCode);
-    // print(wallet_data);
-  }
-    @override
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -94,7 +54,7 @@ class _MyAccountPageState extends State<AccountPage> {
             _logout(context),
           ],
         ),
-        ),
+      ),
     );
   }
 
@@ -106,21 +66,16 @@ class _MyAccountPageState extends State<AccountPage> {
         child: GFButton(
           color: Colors.orange,
           onPressed: () {
-            Driver driver = Driver();
-            String? user_id = driver.id.toString();
-            final String unencodedPathWallet = "/easymovenpick.com/api/commission_statement.php";
-            final Map<String, String> body_wallet = {'uid':user_id};
-            makePostRequestWallet(url, unencodedPathWallet, body_wallet);
-            Navigator.push(context,MaterialPageRoute(builder:(context) => Wallet(wallet_data)));
+            Navigator.push(context,MaterialPageRoute(builder:(context) => Wallet()));
           },
-        child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          Image.asset('assets/images/wallet.png'),
-          Text("Wallet",style:TextStyle(fontSize: 30)),
-        ],
-      ),
-      shape: GFButtonShape.pills,
+          shape: GFButtonShape.pills,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Image.asset('assets/images/wallet.png'),
+              const Text("Wallet",style:TextStyle(fontSize: 30)),
+            ],
+          ),
         )
     );
   }
@@ -128,26 +83,21 @@ class _MyAccountPageState extends State<AccountPage> {
   Widget _merit(context)
   {
     return SizedBox(
-        height: 80,
-        width: 300,
-        child:GFButton(
-          color: Colors.orange,
-          onPressed: () {
-            Driver driver = Driver();
-            String? user_id = driver.id.toString();
-            final String unencodedPathMerit = "/easymovenpick.com/api/merit_statement.php";
-            final Map<String, String> body = {'uid':user_id};
-            makePostRequestMerit(url, unencodedPathMerit, body);
-            Navigator.push(context,MaterialPageRoute(builder:(context) => Merit(merit_data)));
+      height: 80,
+      width: 300,
+      child:GFButton(
+        color: Colors.orange,
+        onPressed: () {
+          Navigator.push(context,MaterialPageRoute(builder:(context) => Merit()));
         },
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          Image.asset('assets/images/merit.png'),
-          Text("Merit",style: TextStyle(fontSize: 30),),
-        ],
-      ),
-      shape: GFButtonShape.pills,
+        shape: GFButtonShape.pills,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            Image.asset('assets/images/merit.png'),
+            const Text("Merit",style: TextStyle(fontSize: 30),),
+          ],
+        ),
       ),
     );
   }
@@ -160,16 +110,21 @@ class _MyAccountPageState extends State<AccountPage> {
         child:GFButton(
           color: Colors.orange,
           onPressed: () {
+            if(driver.status == "on") {
+              driver.status = "off";
+              myLocationService.stop();
+              MyApiService.updateDriverOnOff(driver.id, "off");
+            }
+            notificationService.stop();
             Navigator.popUntil(context,ModalRoute.withName(Navigator.defaultRouteName));
           },
+          shape: GFButtonShape.pills,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              // Image.asset('assets/images/merit.png'),
+            children: const[
               Text("Logout",style: TextStyle(fontSize: 22),),
             ],
           ),
-          shape: GFButtonShape.pills,
         )
     );
   }

@@ -21,15 +21,7 @@ class Notice extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Container(
-            margin: EdgeInsets.only(left: 50,right: 50,bottom: 15),
-            padding: EdgeInsets.all(20.0),
-            decoration: BoxDecoration(
-              border: Border.all(color:Colors.orange,width: 3),
-              borderRadius: BorderRadius.circular(25.0)
-            ),
-            child: Text("Your request for driver registration has been sent. Please allow a maximum of 3 working days for your request to be processed.",style: TextStyle(fontSize: 18),),
-          ),
+          const Text("Registration complete.", style: TextStyle(fontSize: 20),),
           GFButton(
             color: Colors.orange,
             onPressed: () {
