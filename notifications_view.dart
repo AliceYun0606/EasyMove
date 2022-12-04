@@ -4,10 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:notification/notification_data.dart';
 import 'package:http/http.dart' as http;
 
+DateTime now = DateTime.now();
+String year = DateTime(now.year).toString();
+String month = DateTime(now.month).toString();
+
 const String url = "awcgroup.com.my";
 const String unencodedPath = "/easymovenpick.com/api/notification_statement.php";
 final Map<String, String> headers = {'Content-Type': 'application/json; charset=UTF-8'};
-final Map<String, String> body = ({'uid': '1', 'year' : '2021', 'month' : '08'});
+final Map<String, String> body = ({'uid': '1', 'year' : year, 'month' : month});
 
 Future<List<NotificationData>> fetchNoti(String url, String unencodedPath , Map<String, String> header, Map<String, String> requestBody) async {
   final response = await http.post(
@@ -30,12 +34,20 @@ class NotificationView extends StatefulWidget {
 }
 
 class NotificationViewState extends State<NotificationView> {
-  late Future<List<NotificationData>> futureNoti;
+  Future<List<NotificationData>>? futureNoti;
 
   @override
   void initState(){
     super.initState();
-    futureNoti = fetchNoti(url, unencodedPath , headers, body);
+    setUpTimedFetch();
+  }
+
+  setUpTimedFetch() {
+    Timer.periodic(const Duration(milliseconds: 5000), (timer) {
+      setState(() {
+        futureNoti = fetchNoti(url, unencodedPath , headers, body);
+      });
+    });
   }
 
   @override
